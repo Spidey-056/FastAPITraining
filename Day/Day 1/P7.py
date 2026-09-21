@@ -1,4 +1,9 @@
-#Dictionary: collection of key & value pairs
-person = {"Name" : "Prabhanshu", "age" : 19}
+# #Dictionary: collection of key & value pairs
+# person = {"Name" : "Prabhanshu", "age" : 19}
 
-print(person["Name"])
+# print(person["Name"])
+
+def greet(name : str)-> str :
+    return "Hello "+name
+
+print(greet("Prabhanshu"))
