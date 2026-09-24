@@ -1,9 +1,33 @@
-# --- Python Web Cache ---
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
 
-# --- Virtual Environments ---
+# C extensions
+*.so
+
+# Distribution / packaging
+bin/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
 .venv/
 venv/
 ENV/
@@ -11,40 +35,51 @@ env/
 env.bak/
 venv.bak/
 
-# --- Environment Variables & Secrets ---
-# NEVER commit your actual secrets/credentials to GitHub
+# Environment variables and secrets (NEVER commit these)
 .env
 .env.*
 !.env.example
+secrets.toml
 
-# --- FastAPI / SQL Databases (if using SQLite) ---
+# FastAPI / SQL Databases (if using local SQLite for development)
 *.db
+*.sqlite
 *.sqlite3
 
-# --- Testing & Coverage ---
+# Logging
+logs/
+*.log
+*.out
+
+# Unit testing / Coverage reports
 .pytest_cache/
+.tox/
+.nox/
 .coverage
+.coverage.*
+.cache
 htmlcov/
 coverage.xml
+*.cover
+.hypothesis/
 
-# --- Type Checkers & Linters ---
+# Type checkers and linters
 .mypy_cache/
-.ruff_cache/
+.dmypy.json
+dmypy.json
 .pyre/
+.pytype/
+.ruff_cache/
 
-# --- IDEs and Editors ---
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.swp
-
-# --- OS Generated Files ---
+# OS-specific files
 .DS_Store
+.DS_Store?
+ehthumbs.db
+Icon?
 Thumbs.db
 
-# --- Log Files ---
-*.log
-logs/
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
