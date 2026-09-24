@@ -1,0 +1,50 @@
+# --- Python Web Cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual Environments ---
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# --- Environment Variables & Secrets ---
+# NEVER commit your actual secrets/credentials to GitHub
+.env
+.env.*
+!.env.example
+
+# --- FastAPI / SQL Databases (if using SQLite) ---
+*.db
+*.sqlite3
+
+# --- Testing & Coverage ---
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# --- Type Checkers & Linters ---
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# --- IDEs and Editors ---
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# --- OS Generated Files ---
+.DS_Store
+Thumbs.db
+
+# --- Log Files ---
+*.log
+logs/
