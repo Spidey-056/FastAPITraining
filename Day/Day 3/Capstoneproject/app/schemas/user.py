@@ -6,7 +6,7 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
-from app.models.users import UserRole
+from app.models.user import UserRole
 
 class UserCreate(BaseModel):
     """Data required from the client when creating a new user (POST /users)."""
