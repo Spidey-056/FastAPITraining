@@ -24,6 +24,7 @@ from app.dependencies import (
     get_tickets_collection,
     get_categories_collection,
     get_users_collection,
+    get_orders_collection,
     get_audit_logs_collection,
 )
 from app.models.ticket import TicketStatus, is_valid_transition
@@ -45,6 +46,7 @@ def create_ticket(
     tickets_collection: Collection = Depends(get_tickets_collection),
     categories_collection: Collection = Depends(get_categories_collection),
     users_collection: Collection = Depends(get_users_collection),
+    orders_collection: Collection = Depends(get_orders_collection),
     audit_logs_collection: Collection = Depends(get_audit_logs_collection),
 ):
     """
@@ -64,6 +66,11 @@ def create_ticket(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="created_by does not match any existing user.",
         )
+    if payload.order_id and not orders_collection.find_one({"id": payload.order_id}):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="order_id does not match any existing order.",
+        )
 
     now = datetime.utcnow()
     ticket_doc = {
@@ -74,6 +81,7 @@ def create_ticket(
         "status": TicketStatus.NEW,
         "created_by": payload.created_by,
         "assigned_to": None,
+        "order_id": payload.order_id,
         "created_at": now,
         "updated_at": now,
     }
@@ -99,6 +107,7 @@ def list_tickets(
     category_id: Optional[str] = Query(default=None, description="Filter by category id"),
     assigned_to: Optional[str] = Query(default=None, description="Filter by assigned technician's user id"),
     created_by: Optional[str] = Query(default=None, description="Filter by the customer who raised the ticket"),
+    order_id: Optional[str] = Query(default=None, description="Filter by associated order id"),
     skip: int = Query(default=0, ge=0, description="Number of tickets to skip (for pagination)"),
     limit: int = Query(default=20, ge=1, le=100, description="Max number of tickets to return (1-100)"),
 ):
@@ -111,6 +120,7 @@ def list_tickets(
       GET /tickets?status=in_progress              -> only in-progress tickets
       GET /tickets?category_id=<id>&limit=50       -> up to 50 tickets in one category
       GET /tickets?assigned_to=<id>&skip=20&limit=20 -> a technician's tickets, page 2
+      GET /tickets?order_id=<id>                   -> tickets for a specific order
     """
     # Build the MongoDB filter dict from whichever query parameters were actually provided.
     mongo_filter = {}
@@ -122,6 +132,8 @@ def list_tickets(
         mongo_filter["assigned_to"] = assigned_to
     if created_by is not None:
         mongo_filter["created_by"] = created_by
+    if order_id is not None:
+        mongo_filter["order_id"] = order_id
 
     cursor = tickets_collection.find(mongo_filter).sort("created_at", -1).skip(skip).limit(limit)
     return list(cursor)
@@ -145,9 +157,10 @@ def update_ticket(
     payload: TicketUpdate,
     tickets_collection: Collection = Depends(get_tickets_collection),
     categories_collection: Collection = Depends(get_categories_collection),
+    orders_collection: Collection = Depends(get_orders_collection),
 ):
     """
-    Update ticket details (title/description/category) only.
+    Update ticket details (title/description/category/order_id) only.
     Status and assignment are changed through their own dedicated endpoints
     below, so this endpoint deliberately does not touch them.
     """
@@ -164,6 +177,13 @@ def update_ticket(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="category_id does not match any existing category.",
         )
+
+    if "order_id" in update_data and update_data["order_id"] is not None:
+        if not orders_collection.find_one({"id": update_data["order_id"]}):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="order_id does not match any existing order.",
+            )
 
     update_data["updated_at"] = datetime.utcnow()
     tickets_collection.update_one({"id": ticket_id}, {"$set": update_data})

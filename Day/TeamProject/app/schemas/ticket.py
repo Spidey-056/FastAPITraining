@@ -30,6 +30,7 @@ class TicketCreate(BaseModel):
     description: str = Field(..., min_length=5, max_length=2000, description="Full details of the issue")
     category_id: str = Field(..., description="id of an existing Category")
     created_by: str = Field(..., description="id of the Customer raising this ticket")
+    order_id: Optional[str] = Field(default=None, description="Optional id of the customer Order associated with this ticket")
 
     @field_validator("title", "description")
     @classmethod
@@ -53,12 +54,14 @@ class TicketUpdate(BaseModel):
     title: Optional[str] = Field(default=None, min_length=3, max_length=150)
     description: Optional[str] = Field(default=None, min_length=5, max_length=2000)
     category_id: Optional[str] = Field(default=None)
+    order_id: Optional[str] = Field(default=None)
 
 
 class TicketAssign(BaseModel):
     """Used by a Team Lead to assign or reassign a technician to a ticket."""
 
     assigned_to: str = Field(..., description="id of the Support Agent to assign")
+    assigned_by: str = Field(..., description="id of the Support Team Lead making the assignment")
 
 
 class TicketStatusUpdate(BaseModel):
@@ -72,6 +75,7 @@ class TicketStatusUpdate(BaseModel):
     """
 
     status: TicketStatus = Field(..., description="The status to move this ticket to")
+    changed_by: str = Field(..., description="id of the User changing the status")
 
 
 class TicketResponse(BaseModel):
@@ -84,5 +88,6 @@ class TicketResponse(BaseModel):
     status: TicketStatus
     created_by: str
     assigned_to: Optional[str] = None
+    order_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
