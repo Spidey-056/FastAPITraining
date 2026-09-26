@@ -4,7 +4,7 @@
 // Click a ticket row to open its detail page.
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getTickets, getUsers, getCategories, createTicket, deleteTicket } from '../api/client'
+import { getTickets, getUsers, getCategories, getOrders, createTicket, deleteTicket } from '../api/client'
 
 const STATUSES = ['', 'new', 'assigned', 'in_progress', 'on_hold', 'resolved', 'closed']
 
@@ -13,13 +13,14 @@ const STATUS_COLORS = {
   on_hold: 'warning', resolved: 'success', closed: 'dark',
 }
 
-const blank = { title: '', description: '', category_id: '', created_by: '' }
+const blank = { title: '', description: '', category_id: '', created_by: '', order_id: '' }
 
 export default function TicketsPage() {
   const navigate = useNavigate()
   const [tickets, setTickets] = useState([])
   const [users, setUsers] = useState([])
   const [categories, setCategories] = useState([])
+  const [orders, setOrders] = useState([])
   const [statusFilter, setStatusFilter] = useState('')
   const [form, setForm] = useState(blank)
   const [error, setError] = useState('')
@@ -34,6 +35,7 @@ export default function TicketsPage() {
     load()
     getUsers().then(setUsers).catch(() => {})
     getCategories().then(setCategories).catch(() => {})
+    getOrders().then(setOrders).catch(() => {})
   }, [])
 
   const handleFilter = (s) => {
@@ -45,7 +47,14 @@ export default function TicketsPage() {
     e.preventDefault()
     setError('')
     try {
-      await createTicket(form)
+      const payload = {
+        title: form.title,
+        description: form.description,
+        category_id: form.category_id,
+        created_by: form.created_by,
+        order_id: form.order_id || null,
+      }
+      await createTicket(payload)
       setForm(blank)
       load()
     } catch (err) {
@@ -88,7 +97,18 @@ export default function TicketsPage() {
           </select>
         </div>
         <div className="col-md-2">
-          <button className="btn btn-sm btn-primary w-100" type="submit">Create Ticket</button>
+          <select className="form-select form-select-sm" value={form.order_id}
+            onChange={e => setForm({ ...form, order_id: e.target.value })}>
+            <option value="">-- Order (Optional) --</option>
+            {orders.map(o => (
+              <option key={o.id} value={o.id}>
+                {o.order_number} (${o.total_amount})
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="col-12 text-end">
+          <button className="btn btn-sm btn-primary px-4" type="submit">Create Ticket</button>
         </div>
         {error && <div className="col-12"><small className="text-danger">{error}</small></div>}
       </form>
@@ -105,17 +125,26 @@ export default function TicketsPage() {
 
       {/* Tickets table */}
       {loading ? <p>Loading…</p> : (
-        <table className="table table-sm table-bordered table-hover">
+        <table className="table table-sm table-bordered table-hover align-middle">
           <thead className="table-dark">
-            <tr><th>Title</th><th>Status</th><th>Category</th><th>Created</th><th></th></tr>
+            <tr><th>Title</th><th>Status</th><th>Category</th><th>Linked Order</th><th>Created</th><th></th></tr>
           </thead>
           <tbody>
-            {tickets.length === 0 && <tr><td colSpan={5} className="text-center text-muted">No tickets.</td></tr>}
+            {tickets.length === 0 && <tr><td colSpan={6} className="text-center text-muted">No tickets.</td></tr>}
             {tickets.map(t => (
               <tr key={t.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/tickets/${t.id}`)}>
-                <td>{t.title}</td>
+                <td className="fw-semibold">{t.title}</td>
                 <td><span className={`badge bg-${STATUS_COLORS[t.status] || 'secondary'}`}>{t.status}</span></td>
                 <td>{categories.find(c => c.id === t.category_id)?.name || t.category_id}</td>
+                <td>
+                  {t.order_id ? (
+                    <span className="badge bg-light text-dark border">
+                      {orders.find(o => o.id === t.order_id)?.order_number || t.order_id.slice(0, 8)}
+                    </span>
+                  ) : (
+                    <span className="text-muted small">—</span>
+                  )}
+                </td>
                 <td>{new Date(t.created_at).toLocaleDateString()}</td>
                 <td onClick={e => e.stopPropagation()}>
                   <button className="btn btn-sm btn-outline-danger" onClick={(e) => handleDelete(e, t.id)}>Delete</button>

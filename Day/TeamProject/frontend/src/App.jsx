@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import NavBar from './components/NavBar'
 import UsersPage from './pages/UsersPage'
 import CategoriesPage from './pages/CategoriesPage'
+import OrdersPage from './pages/OrdersPage'
 import TicketsPage from './pages/TicketsPage'
 import TicketDetailPage from './pages/TicketDetailPage'
 import AuditLogsPage from './pages/AuditLogsPage'
@@ -16,6 +17,7 @@ export default function App() {
       <div className="container mt-4">
         <Routes>
           <Route path="/" element={<Navigate to="/tickets" replace />} />
+          <Route path="/orders" element={<OrdersPage />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/tickets" element={<TicketsPage />} />

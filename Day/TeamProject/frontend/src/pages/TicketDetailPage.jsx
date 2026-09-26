@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
-  getTicket, getUsers,
+  getTicket, getUsers, getOrder,
   assignTicket, updateTicketStatus,
   getComments, createComment, deleteComment,
   getAttachments, createAttachment, deleteAttachment,
@@ -34,6 +34,7 @@ export default function TicketDetailPage() {
   const navigate = useNavigate()
 
   const [ticket, setTicket] = useState(null)
+  const [order, setOrder] = useState(null)
   const [users, setUsers] = useState([])
   const [comments, setComments] = useState([])
   const [attachments, setAttachments] = useState([])
@@ -56,7 +57,16 @@ export default function TicketDetailPage() {
   const [attForm, setAttForm] = useState({ filename: '', url: '', size: '', uploaded_by: '' })
 
   const loadAll = () => {
-    getTicket(ticketId).then(setTicket).catch(() => navigate('/tickets'))
+    getTicket(ticketId)
+      .then((t) => {
+        setTicket(t)
+        if (t.order_id) {
+          getOrder(t.order_id).then(setOrder).catch(() => setOrder(null))
+        } else {
+          setOrder(null)
+        }
+      })
+      .catch(() => navigate('/tickets'))
     getComments(ticketId).then(setComments).catch(() => {})
     getAttachments(ticketId).then(setAttachments).catch(() => {})
     getTicketAuditLogs(ticketId).then(setAuditLogs).catch(() => {})
@@ -136,6 +146,41 @@ export default function TicketDetailPage() {
           </small>
         </div>
       </div>
+
+      {/* Linked Order Card (Domain Integration) */}
+      {order && (
+        <div className="card mb-3 border-primary">
+          <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2">
+            <span className="fw-semibold">Linked Order: {order.order_number}</span>
+            <div>
+              <span className="badge bg-light text-dark me-2">Payment: {order.payment_status}</span>
+              <span className="badge bg-light text-dark">Delivery: {order.delivery_status}</span>
+            </div>
+          </div>
+          <div className="card-body py-2">
+            <div className="row">
+              <div className="col-md-4">
+                <small className="text-muted d-block">Total Amount</small>
+                <strong>${Number(order.total_amount).toFixed(2)}</strong>
+              </div>
+              <div className="col-md-8">
+                <small className="text-muted d-block">Items in Order</small>
+                {order.items?.length > 0 ? (
+                  <ul className="list-unstyled mb-0 small">
+                    {order.items.map((it, idx) => (
+                      <li key={idx}>
+                        • <strong>{it.name}</strong> (Qty: {it.quantity}) — ${Number(it.price).toFixed(2)} each
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span className="text-muted small">No items specified.</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="row g-3">
         {/* Assign technician */}

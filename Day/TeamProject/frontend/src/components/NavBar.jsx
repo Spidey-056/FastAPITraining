@@ -10,6 +10,7 @@ export default function NavBar() {
       <div className="navbar-nav">
         {[
           ['/tickets', 'Tickets'],
+          ['/orders', 'Orders'],
           ['/users', 'Users'],
           ['/categories', 'Categories'],
           ['/audit-logs', 'Audit Logs'],

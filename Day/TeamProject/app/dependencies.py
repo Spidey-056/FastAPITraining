@@ -56,3 +56,8 @@ def get_attachments_collection(db: Database = Depends(get_db)) -> Collection:
 def get_audit_logs_collection(db: Database = Depends(get_db)) -> Collection:
     """Provides access to the 'audit_logs' collection."""
     return db["audit_logs"]
+
+
+def get_orders_collection(db: Database = Depends(get_db)) -> Collection:
+    """Provides access to the 'orders' collection."""
+    return db["orders"]
