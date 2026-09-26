@@ -145,7 +145,7 @@ export default function OrdersPage() {
               type="number"
               step="0.01"
               className="form-control form-control-sm"
-              placeholder="Price ($)"
+              placeholder="Price (₹)"
               min={0}
               required
               value={form.itemPrice}
@@ -225,19 +225,19 @@ export default function OrdersPage() {
                   {o.items?.length > 0
                     ? o.items.map((it, idx) => (
                         <div key={idx} className="small">
-                          {it.name} (x{it.quantity}) - ${it.price}
+                          {it.name} (x{it.quantity}) - ₹{it.price}
                         </div>
                       ))
                     : <span className="text-muted small">No items</span>}
                 </td>
-                <td>${Number(o.total_amount).toFixed(2)}</td>
+                <td>₹{Number(o.total_amount).toFixed(2)}</td>
                 <td>
-                  <span className={`badge bg-${PAYMENT_BADGES[o.payment_status] || 'secondary'}`}>
+                  <span className={`badge bg-₹{PAYMENT_BADGES[o.payment_status] || 'secondary'}`}>
                     {o.payment_status}
                   </span>
                 </td>
                 <td>
-                  <span className={`badge bg-${DELIVERY_BADGES[o.delivery_status] || 'secondary'}`}>
+                  <span className={`badge bg-₹{DELIVERY_BADGES[o.delivery_status] || 'secondary'}`}>
                     {o.delivery_status}
                   </span>
                 </td>
