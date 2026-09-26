@@ -29,6 +29,15 @@ export const getCategories = () => request('GET', '/categories')
 export const createCategory = (body) => request('POST', '/categories', body)
 export const deleteCategory = (id) => request('DELETE', `/categories/${id}`)
 
+// --- Orders ---
+export const getOrders = (params = '') => request('GET', `/orders${params}`)
+export const getOrder = (id) => request('GET', `/orders/${id}`)
+export const createOrder = (body) => request('POST', '/orders', body)
+export const updateOrder = (id, body) => request('PUT', `/orders/${id}`, body)
+export const deleteOrder = (id) => request('DELETE', `/orders/${id}`)
+export const getOrderTickets = (orderId) => request('GET', `/orders/${orderId}/tickets`)
+
+
 // --- Tickets ---
 export const getTickets = (params = '') => request('GET', `/tickets${params}`)
 export const getTicket = (id) => request('GET', `/tickets/${id}`)
